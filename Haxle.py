@@ -17,10 +17,11 @@ camera_speed = 15
 background_color = 'SeaGreen'
 background = pygame.Surface((windowX, windowY))
 background.fill(pygame.Color(background_color))
-truck = pygame.image.load('truck.png')
-truck.convert_alpha()
-truckX = 100
-truckY = windowY*startYOffset - truck.get_size()[1]
+Trucks = pygame.sprite.Group()
+#truck = pygame.image.load('truck.png')
+#truck.convert_alpha()
+#truckX = 100
+#truckY = windowY*startYOffset - truck.get_size()[1]
 
 manager = pygame_gui.UIManager((windowX, windowY))
 
@@ -38,13 +39,28 @@ for i in range(1,windowX,smoothness):
 class Truck(pygame.sprite.Sprite):
     def __init__(self, color, width, height):
         pygame.sprite.Sprite.__init__(self)
-
-
+        self.height = height
+        self.width = width 
+        self.x = 100
+        self.y = windowY*startYOffset - self.height
+        self.image = pygame.Surface([width, height])
+        self.image.fill(color)
+        self.rect = self.image.get_rect()
+        
+        self.rear_wheel = pygame.Surface([20,20])
+        self.rear_wheel.fill((0,255,0))
+        pygame.draw.circle(self.rear_wheel, color, (self.x, self.y-30), 10, 3)
+        
+truck = Truck('Black',100,50)
+Trucks.add(truck)
 
 is_running = True
 timing = 0
 while is_running:
-    background.blit(truck,(truckX,truckY))
+    
+    for Truck in Trucks:
+        background.blit(Truck.image, (Truck.x, Truck.y))
+    
     ticks+=1
     if bumpiness < 10: bumpiness+=(ticks/100000)
     for event in pygame.event.get():
@@ -55,6 +71,8 @@ while is_running:
     
     background.fill(pygame.Color(background_color))
     pygame.draw.lines(background, (200,200,200), False, points, width=1)
+    
+
     timing += camera_speed
     if timing >= 60:
         timing -=60
