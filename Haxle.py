@@ -11,8 +11,10 @@ windowX = 1600
 windowY = 900
 
 window_surface = pygame.display.set_mode((windowX, windowY))
-
-window_surface.fill(pygame.Color('black'))
+camera_speed = 30
+background_color = 'SeaGreen'#'DarkOliveGreen'#'MediumSeaGreen'
+background = pygame.Surface((windowX, windowY))
+background.fill(pygame.Color(background_color))
 
 manager = pygame_gui.UIManager((windowX, windowY))
 
@@ -24,5 +26,6 @@ while is_running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             is_running = False
-    
+    window_surface.blit(background, (0, 0))
+    background.fill(pygame.Color(background_color))
     pygame.display.update()
