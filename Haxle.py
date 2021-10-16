@@ -42,16 +42,19 @@ class Truck(pygame.sprite.Sprite):
         self.height = height
         self.width = width 
         self.x = 100
-        self.y = windowY*startYOffset - self.height
+        self.y = windowY*startYOffset - self.height*2
         self.image = pygame.Surface([width, height])
         self.image.fill(color)
         self.rect = self.image.get_rect()
+        self.suspension_height = 20
         
-        self.rear_wheel = pygame.Surface([20,20])
-        self.rear_wheel.fill((0,255,0))
-        pygame.draw.circle(self.rear_wheel, color, (self.x, self.y-30), 10, 3)
+        self.rear_wheel = pygame.Surface([40, 40], pygame.SRCALPHA)
+        pygame.draw.circle(self.rear_wheel, color, (20, 20), 20)
         
-truck = Truck('Black',100,50)
+        self.front_wheel = pygame.Surface([40, 40], pygame.SRCALPHA)
+        pygame.draw.circle(self.front_wheel, color, (20, 20), 20)
+
+truck = Truck('Black', 150, 60)
 Trucks.add(truck)
 
 is_running = True
@@ -60,6 +63,8 @@ while is_running:
     
     for Truck in Trucks:
         background.blit(Truck.image, (Truck.x, Truck.y))
+        background.blit(Truck.rear_wheel, (Truck.x, Truck.y+Truck.height+Truck.suspension_height))
+        background.blit(Truck.front_wheel, (Truck.x+Truck.width-40, Truck.y+Truck.height+Truck.suspension_height))
     
     ticks+=1
     if bumpiness < 10: bumpiness+=(ticks/100000)
