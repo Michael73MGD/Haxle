@@ -26,8 +26,8 @@ manager = pygame_gui.UIManager((windowX, windowY))
 
 points = [(0,windowY*startYOffset)]
 lastY = windowY*startYOffset
-bumpiness = .1
-smoothness = 40
+bumpiness = .05
+smoothness = 10
 for i in range(1,windowX,smoothness):
     dy = random.uniform(-1*bumpiness,bumpiness)
 
@@ -46,7 +46,7 @@ timing = 0
 while is_running:
     background.blit(truck,(truckX,truckY))
     ticks+=1
-    if bumpiness < 15: bumpiness+=(ticks/100000)
+    if bumpiness < 10: bumpiness+=(ticks/100000)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             is_running = False
