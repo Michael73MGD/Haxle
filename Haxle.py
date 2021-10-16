@@ -24,7 +24,8 @@ Trucks = pygame.sprite.Group()
 #truckY = windowY*startYOffset - truck.get_size()[1]
 
 manager = pygame_gui.UIManager((windowX, windowY))
-
+Gravity = .01 #random guess
+terminal_velocity = 10
 points = [(0,windowY*startYOffset)]
 lastY = windowY*startYOffset
 bumpiness = .05
@@ -42,17 +43,49 @@ class Truck(pygame.sprite.Sprite):
         self.height = height
         self.width = width 
         self.x = 100
-        self.y = windowY*startYOffset - self.height*2
+        self.y = 0#windowY*startYOffset - self.height*2
         self.image = pygame.Surface([width, height])
         self.image.fill(color)
         self.rect = self.image.get_rect()
         self.suspension_height = 20
+        self.suspension_constant = 10 #random guess, no idea what units are
+        self.wheel_radius = 20
+        self.rear_wheel = pygame.Surface([self.wheel_radius*2, self.wheel_radius*2], pygame.SRCALPHA)
+        self.rear_wheel_y = self.y+self.height+self.suspension_height
+        pygame.draw.circle(self.rear_wheel, color, (self.wheel_radius, self.wheel_radius), self.wheel_radius)
+
+        self.front_wheel = pygame.Surface([self.wheel_radius*2, self.wheel_radius*2], pygame.SRCALPHA)
+        self.front_wheel_y = self.y+self.height+self.suspension_height
+        pygame.draw.circle(self.front_wheel, color, (self.wheel_radius, self.wheel_radius), self.wheel_radius)
+        self.x_F = 0 #x force component (acceleration)
+        self.y_F = 0
+        self.x_V = 0 #x velecity component (speed)
+        self.y_V = 0
         
-        self.rear_wheel = pygame.Surface([40, 40], pygame.SRCALPHA)
-        pygame.draw.circle(self.rear_wheel, color, (20, 20), 20)
         
-        self.front_wheel = pygame.Surface([40, 40], pygame.SRCALPHA)
-        pygame.draw.circle(self.front_wheel, color, (20, 20), 20)
+    def check_collision(self):
+        # use this method for lines intersecting a rectangle http://www.pygame.org/docs/ref/rect.html#pygame.Rect.clipline
+        for point in points:
+            if math.hypot(point[0]-self.x, point[1]-self.rear_wheel_y) < self.wheel_radius:
+                print('wheel crashed')
+                
+            if self.rect.collidepoint(point):
+                print('Crash')
+    def update(self):  #eventually, pass the gas/brake, angular velocity etc
+        
+        self.y_F += Gravity
+
+        self.check_collision()
+
+        if self.y_V < terminal_velocity:
+            self.y_V += self.y_F
+        self.y += self.y_V
+        self.rear_wheel_y = self.y+self.height+self.suspension_height
+        self.front_wheel_y = self.y+self.height+self.suspension_height
+        self.x_V += self.x_F
+        self.x += self.x_V
+    
+
 
 truck = Truck('Black', 150, 60)
 Trucks.add(truck)
@@ -62,9 +95,10 @@ timing = 0
 while is_running:
     
     for Truck in Trucks:
+        Truck.update()
         background.blit(Truck.image, (Truck.x, Truck.y))
-        background.blit(Truck.rear_wheel, (Truck.x, Truck.y+Truck.height+Truck.suspension_height))
-        background.blit(Truck.front_wheel, (Truck.x+Truck.width-40, Truck.y+Truck.height+Truck.suspension_height))
+        background.blit(Truck.rear_wheel, (Truck.x, Truck.rear_wheel_y))
+        background.blit(Truck.front_wheel, (Truck.x+Truck.width-40, Truck.front_wheel_y))
     
     ticks+=1
     if bumpiness < 10: bumpiness+=(ticks/100000)
