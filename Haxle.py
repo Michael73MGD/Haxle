@@ -199,8 +199,8 @@ while is_running:
         for i in range(0,len(points)-1):
             points[i] = (points[i][0],points[i+1][1])
     newY = int(random.uniform(-1*bumpiness,bumpiness+1)+points[len(points)-1][1])
-    if newY >= windowY-100: newY=windowY-1
-    elif newY <= 0: newY=0
+    if newY >= windowY-1: newY=windowY-1
+    elif newY <= 100: newY=100
     points[len(points)-1]=(windowX,newY)
 
     
