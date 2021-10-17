@@ -25,7 +25,7 @@ class Truck(pygame.sprite.Sprite):
         self.image = pygame.Surface([width, height])
         self.image.fill(color)
         self.rect = self.image.get_rect()
-        self.image = pygame.image.load('truckPro.png')
+        self.image = pygame.image.load('truckButBetter.png')
 
         # [Sus]pension params
         self.rear_suspension_height = 20
@@ -145,7 +145,7 @@ windowY = 900
 startYOffset = .9
 ticks=0
 window_surface = pygame.display.set_mode((windowX, windowY))
-camera_speed = 15
+camera_speed = 300
 background_color = 'SeaGreen'
 background = pygame.Surface((windowX, windowY))
 background.fill(pygame.Color(background_color))
@@ -156,7 +156,7 @@ Trucks = pygame.sprite.Group()
 #truckY = windowY*startYOffset - truck.get_size()[1]
 
 manager = pygame_gui.UIManager((windowX, windowY))
-Gravity = .05 #random guess
+Gravity = .01 #random guess
 terminal_velocity = 10
 points = [(0,windowY*startYOffset)]
 lastY = windowY*startYOffset
@@ -186,7 +186,7 @@ while is_running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             is_running = False
-    ms = clock.tick(60)
+    ms = clock.tick(120)
     window_surface.blit(background, (0, 0))
     
     background.fill(pygame.Color(background_color))
