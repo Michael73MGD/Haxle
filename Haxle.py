@@ -94,6 +94,8 @@ class Truck(pygame.sprite.Sprite):
         #self.y += self.y_V
         if self.rear_suspension_height < 20:
             self.rear_suspension_height += 1.5
+        if self.front_suspension_height < 20:
+            self.front_suspension_height += 1.5
 
         #print(self.rear_suspension_height)
         #should NOT be self.width but whatevs
