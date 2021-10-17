@@ -16,7 +16,7 @@ class Truck(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rear_suspension_height = 20
         self.front_suspension_height = 20
-        self.suspension_constant = .05 #random guess, no idea what units are
+        self.suspension_constant = .3 #random guess, no idea what units are
         self.wheel_radius = 20
         self.rear_wheel_spring_force = 0
         self.rear_wheel = pygame.Surface([self.wheel_radius*2, self.wheel_radius*2], pygame.SRCALPHA)
@@ -44,7 +44,7 @@ class Truck(pygame.sprite.Sprite):
     def check_collision(self):
         # use this method for lines intersecting a rectangle http://www.pygame.org/docs/ref/rect.html#pygame.Rect.clipline
         for point in points:
-            if math.hypot(point[0]-self.rear_wheel_x, point[1]-self.rear_wheel_y) < self.wheel_radius*2:
+            if math.hypot(point[0]-self.rear_wheel_x, point[1]-self.rear_wheel_y) < self.wheel_radius:
                 #print('rear wheel collision')
                 self.rear_wheel_touching_ground = True
                 self.rear_wheel_spring_force = -1*self.rear_wheel_y_F
@@ -82,6 +82,7 @@ class Truck(pygame.sprite.Sprite):
             self.y_V += self.y_F
         if self.rear_wheel_y_V < terminal_velocity:
             self.rear_wheel_y_V += self.rear_wheel_y_F
+            #print(self.rear_wheel_y_V)
         if self.front_wheel_y_V < terminal_velocity: 
             self.front_wheel_y_V += self.front_wheel_y_F
         #self.y += self.y_V
@@ -89,6 +90,7 @@ class Truck(pygame.sprite.Sprite):
             self.rear_suspension_height += 1.5
 
         #print(self.rear_suspension_height)
+
         self.rear_wheel_y += self.rear_wheel_y_V
         self.y = self.rear_wheel_y - self.rear_suspension_height - self.height
         self.front_wheel_y += self.front_wheel_y_V
@@ -116,7 +118,7 @@ Trucks = pygame.sprite.Group()
 #truckY = windowY*startYOffset - truck.get_size()[1]
 
 manager = pygame_gui.UIManager((windowX, windowY))
-Gravity = .01 #random guess
+Gravity = .1 #random guess
 terminal_velocity = 10
 points = [(0,windowY*startYOffset)]
 lastY = windowY*startYOffset
