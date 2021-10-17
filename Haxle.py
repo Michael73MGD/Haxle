@@ -4,39 +4,6 @@ import math
 import random
 import numpy
 
-#Initialization and global vars
-pygame.init()
-clock = pygame.time.Clock()
-pygame.display.set_caption('Haxle')
-windowX = 1600
-windowY = 900
-startYOffset = .9
-ticks=0
-window_surface = pygame.display.set_mode((windowX, windowY))
-camera_speed = 15
-background_color = 'SeaGreen'
-background = pygame.Surface((windowX, windowY))
-background.fill(pygame.Color(background_color))
-Trucks = pygame.sprite.Group()
-#truck = pygame.image.load('truck.png')
-#truck.convert_alpha()
-#truckX = 100
-#truckY = windowY*startYOffset - truck.get_size()[1]
-
-manager = pygame_gui.UIManager((windowX, windowY))
-Gravity = .01 #random guess
-terminal_velocity = 10
-points = [(0,windowY*startYOffset)]
-lastY = windowY*startYOffset
-bumpiness = .05
-smoothness = 10
-for i in range(1,windowX,smoothness):
-    dy = random.uniform(-1*bumpiness,bumpiness)
-
-    points.append((i,int(lastY+dy)))
-    lastY = lastY+dy
-
-
 class Truck(pygame.sprite.Sprite):
     def __init__(self, color, width, height):
         pygame.sprite.Sprite.__init__(self)
@@ -114,6 +81,37 @@ class Truck(pygame.sprite.Sprite):
         self.x += self.x_V
     
 
+#Initialization and global vars
+pygame.init()
+clock = pygame.time.Clock()
+pygame.display.set_caption('Haxle')
+windowX = 1600
+windowY = 900
+startYOffset = .9
+ticks=0
+window_surface = pygame.display.set_mode((windowX, windowY))
+camera_speed = 15
+background_color = 'SeaGreen'
+background = pygame.Surface((windowX, windowY))
+background.fill(pygame.Color(background_color))
+Trucks = pygame.sprite.Group()
+#truck = pygame.image.load('truck.png')
+#truck.convert_alpha()
+#truckX = 100
+#truckY = windowY*startYOffset - truck.get_size()[1]
+
+manager = pygame_gui.UIManager((windowX, windowY))
+Gravity = .01 #random guess
+terminal_velocity = 10
+points = [(0,windowY*startYOffset)]
+lastY = windowY*startYOffset
+bumpiness = .05
+smoothness = 10
+for i in range(1,windowX,smoothness):
+    dy = random.uniform(-1*bumpiness,bumpiness)
+
+    points.append((i,int(lastY+dy)))
+    lastY = lastY+dy
 
 truck = Truck('Black', 150, 60)
 Trucks.add(truck)
