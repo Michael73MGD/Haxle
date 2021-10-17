@@ -19,13 +19,13 @@ class Truck(pygame.sprite.Sprite):
         self.height = height
         self.width = width 
         self.x = 100
-        self.y = 0  #windowY*startYOffset - self.height*2
+        self.y = 400  #windowY*startYOffset - self.height*2
 
         # Image params
         self.image = pygame.Surface([width, height])
         self.image.fill(color)
         self.rect = self.image.get_rect()
-        self.image = pygame.image.load('truckButBetter.png')
+        self.image = pygame.image.load('truckPro.png')
 
         # [Sus]pension params
         self.rear_suspension_height = 20
@@ -120,6 +120,8 @@ class Truck(pygame.sprite.Sprite):
             self.rear_suspension_height += 1.5
         if self.front_suspension_height < 20:
             self.front_suspension_height += 1.5
+        
+        
 
         #print(self.rear_suspension_height)
         #should NOT be self.width but whatevs
@@ -174,7 +176,11 @@ Trucks.add(truck)
 is_running = True
 timing = 0
 while is_running:
-    
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            is_running = False
+
+
     for Truck in Trucks:
         Truck.update()
         #background.blit(Truck.image, (Truck.x, Truck.y))
@@ -183,9 +189,7 @@ while is_running:
     
     ticks+=1
     if bumpiness < 10: bumpiness+=(ticks/100000)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            is_running = False
+    
     ms = clock.tick(120)
     window_surface.blit(background, (0, 0))
     
