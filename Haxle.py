@@ -19,18 +19,18 @@ class Truck(pygame.sprite.Sprite):
         self.height = height
         self.width = width 
         self.x = 100
-        self.y = 0  #windowY*startYOffset - self.height*2
+        self.y = 400  #windowY*startYOffset - self.height*2
 
         # Image params
         self.image = pygame.Surface([width, height])
         self.image.fill(color)
         self.rect = self.image.get_rect()
-        self.image = pygame.image.load('truckButBetter.png')
+        self.image = pygame.image.load('truckPro.png')
 
         # [Sus]pension params
         self.rear_suspension_height = 20
         self.front_suspension_height = 20
-        self.suspension_constant = .1 #random guess, no idea what units are
+        self.suspension_constant = suspension_constant #random guess, no idea what units are
         self.wheel_radius = 32
         self.rear_wheel_spring_force = 0
         self.front_wheel_spring_force = 0
@@ -156,11 +156,12 @@ Trucks = pygame.sprite.Group()
 #truckY = windowY*startYOffset - truck.get_size()[1]
 
 manager = pygame_gui.UIManager((windowX, windowY))
-Gravity = .01 #random guess
+Gravity = .001 #random guess
+suspension_constant = Gravity * 10
 terminal_velocity = 10
 points = [(0,windowY*startYOffset)]
 lastY = windowY*startYOffset
-bumpiness = .05
+bumpiness = .5
 smoothness = 10
 for i in range(1,windowX,smoothness):
     dy = random.uniform(-1*bumpiness,bumpiness)
