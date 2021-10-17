@@ -31,14 +31,15 @@ class Truck(pygame.sprite.Sprite):
         self.rear_suspension_height = 20
         self.front_suspension_height = 20
         self.suspension_constant = .1 #random guess, no idea what units are
-        self.wheel_radius = 20
+        self.wheel_radius = 32
         self.rear_wheel_spring_force = 0
         self.front_wheel_spring_force = 0
 
         # Rear wheel params
         self.rear_wheel = pygame.Surface([self.wheel_radius*2, self.wheel_radius*2], pygame.SRCALPHA)
+        self.rear_wheel = pygame.image.load('WHEEL.png')
         self.rear_wheel_y = self.y+self.height+self.rear_suspension_height+self.wheel_radius
-        self.rear_wheel_x = self.x+self.wheel_radius
+        self.rear_wheel_x = self.x+10
 
         self.rear_wheel_y_V = 0
         self.rear_wheel_y_F = 0
@@ -47,7 +48,7 @@ class Truck(pygame.sprite.Sprite):
         # Front wheel params
         self.front_wheel = pygame.Surface([self.wheel_radius*2, self.wheel_radius*2], pygame.SRCALPHA)
         self.front_wheel_y = self.y+self.height+self.front_suspension_height+self.wheel_radius
-        self.front_wheel_x = self.x+self.width-self.wheel_radius*2
+        self.front_wheel_x = self.x+self.width- self.wheel_radius*2
 
         self.front_wheel_y_V = 0
         self.front_wheel_y_F = 0
@@ -166,7 +167,7 @@ for i in range(1,windowX,smoothness):
     points.append((i,int(lastY+dy)))
     lastY = lastY+dy
 
-truck = Truck('Black', 150, 60)
+truck = Truck('Black', 192, 60)
 Trucks.add(truck)
 
 is_running = True
@@ -176,8 +177,8 @@ while is_running:
     for Truck in Trucks:
         Truck.update()
         #background.blit(Truck.image, (Truck.x, Truck.y))
-        background.blit(Truck.rear_wheel, (Truck.x, Truck.rear_wheel_y))
-        background.blit(Truck.front_wheel, (Truck.x+Truck.width-Truck.wheel_radius*2, Truck.front_wheel_y))
+        background.blit(Truck.rear_wheel, (Truck.rear_wheel_x, Truck.rear_wheel_y))
+        background.blit(Truck.front_wheel, (Truck.front_wheel_x, Truck.front_wheel_y))
     
     ticks+=1
     if bumpiness < 10: bumpiness+=(ticks/100000)
