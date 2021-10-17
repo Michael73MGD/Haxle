@@ -52,10 +52,18 @@ class Truck(pygame.sprite.Sprite):
         self.wheel_radius = 20
         self.rear_wheel = pygame.Surface([self.wheel_radius*2, self.wheel_radius*2], pygame.SRCALPHA)
         self.rear_wheel_y = self.y+self.height+self.suspension_height
+        self.rear_wheel_x = self.x+self.wheel_radius
+        self.rear_wheel_y_V = 0
+        self.rear_wheel_y_F = 0
+        self.rear_wheel_touching_ground = False
         pygame.draw.circle(self.rear_wheel, color, (self.wheel_radius, self.wheel_radius), self.wheel_radius)
 
         self.front_wheel = pygame.Surface([self.wheel_radius*2, self.wheel_radius*2], pygame.SRCALPHA)
         self.front_wheel_y = self.y+self.height+self.suspension_height
+        self.front_wheel_x = self.x+self.width-self.wheel_radius*2
+        self.front_wheel_y_V = 0
+        self.front_wheel_y_F = 0
+        self.front_wheel_touching_ground = False
         pygame.draw.circle(self.front_wheel, color, (self.wheel_radius, self.wheel_radius), self.wheel_radius)
         self.x_F = 0 #x force component (acceleration)
         self.y_F = 0
@@ -66,22 +74,40 @@ class Truck(pygame.sprite.Sprite):
     def check_collision(self):
         # use this method for lines intersecting a rectangle http://www.pygame.org/docs/ref/rect.html#pygame.Rect.clipline
         for point in points:
-            if math.hypot(point[0]-self.x, point[1]-self.rear_wheel_y) < self.wheel_radius:
-                print('wheel crashed')
-                
+            if math.hypot(point[0]-self.rear_wheel_x, point[1]-self.rear_wheel_y) < self.wheel_radius*2:
+                #print('rear wheel collision')
+                self.rear_wheel_touching_ground = True
+                self.rear_wheel_y_V = 0
+                self.rear_wheel_y_F = 0
+                self.rear_wheel_y = point[1]-self.wheel_radius*2
+
+            if math.hypot(point[0]-self.front_wheel_x, point[1]-self.front_wheel_y) < self.wheel_radius*2:
+                #print('rear wheel collision')
+                self.front_wheel_touching_ground = True
+                self.front_wheel_y_V = 0
+                self.front_wheel_y_F = 0
+                self.front_wheel_y = point[1]-self.wheel_radius*2
+
             if self.rect.collidepoint(point):
                 print('Crash')
     def update(self):  #eventually, pass the gas/brake, angular velocity etc
-        
-        self.y_F += Gravity
-
         self.check_collision()
+        self.y_F += Gravity
+        if not self.rear_wheel_touching_ground:
+            self.rear_wheel_y_F += Gravity
+        if not self.front_wheel_touching_ground:
+            self.front_wheel_y_F += Gravity
+        
 
         if self.y_V < terminal_velocity:
             self.y_V += self.y_F
+        if self.rear_wheel_y_V < terminal_velocity:
+            self.rear_wheel_y_V += self.rear_wheel_y_F
+        if self.front_wheel_y_V < terminal_velocity: 
+            self.front_wheel_y_V += self.front_wheel_y_F
         self.y += self.y_V
-        self.rear_wheel_y = self.y+self.height+self.suspension_height
-        self.front_wheel_y = self.y+self.height+self.suspension_height
+        self.rear_wheel_y += self.rear_wheel_y_V
+        self.front_wheel_y += self.front_wheel_y_V
         self.x_V += self.x_F
         self.x += self.x_V
     
@@ -98,7 +124,7 @@ while is_running:
         Truck.update()
         background.blit(Truck.image, (Truck.x, Truck.y))
         background.blit(Truck.rear_wheel, (Truck.x, Truck.rear_wheel_y))
-        background.blit(Truck.front_wheel, (Truck.x+Truck.width-40, Truck.front_wheel_y))
+        background.blit(Truck.front_wheel, (Truck.x+Truck.width-Truck.wheel_radius*2, Truck.front_wheel_y))
     
     ticks+=1
     if bumpiness < 10: bumpiness+=(ticks/100000)
