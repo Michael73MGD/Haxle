@@ -20,8 +20,9 @@ class Truck(pygame.sprite.Sprite):
         self.wheel_radius = 20
         self.rear_wheel_spring_force = 0
         self.rear_wheel = pygame.Surface([self.wheel_radius*2, self.wheel_radius*2], pygame.SRCALPHA)
-        self.rear_wheel_y = self.y+self.height+self.rear_suspension_height
+        self.rear_wheel_y = self.y+self.height+self.rear_suspension_height+self.wheel_radius
         self.rear_wheel_x = self.x+self.wheel_radius
+
         self.rear_wheel_y_V = 0
         self.rear_wheel_y_F = 0
         self.rear_wheel_touching_ground = False
@@ -29,7 +30,7 @@ class Truck(pygame.sprite.Sprite):
 
         self.front_wheel_spring_force = 0
         self.front_wheel = pygame.Surface([self.wheel_radius*2, self.wheel_radius*2], pygame.SRCALPHA)
-        self.front_wheel_y = self.y+self.height+self.front_suspension_height
+        self.front_wheel_y = self.y+self.height+self.front_suspension_height+self.wheel_radius
         self.front_wheel_x = self.x+self.width-self.wheel_radius*2
         self.front_wheel_y_V = 0
         self.front_wheel_y_F = 0
@@ -43,8 +44,10 @@ class Truck(pygame.sprite.Sprite):
         
     def check_collision(self):
         # use this method for lines intersecting a rectangle http://www.pygame.org/docs/ref/rect.html#pygame.Rect.clipline
+        self.rear_wheel_touching_ground = False
+        self.front_wheel_touching_ground = False
         for point in points:
-            if math.hypot(point[0]-self.rear_wheel_x, point[1]-self.rear_wheel_y) < self.wheel_radius:
+            if math.hypot(point[0]-self.rear_wheel_x, point[1]-self.rear_wheel_y) < self.wheel_radius*2:
                 #print('rear wheel collision')
                 self.rear_wheel_touching_ground = True
                 self.rear_wheel_spring_force = -1*self.rear_wheel_y_F
@@ -55,7 +58,6 @@ class Truck(pygame.sprite.Sprite):
                 self.rear_wheel_y_V = 0
                 self.rear_wheel_y_F = 0
                 self.rear_wheel_y = point[1]-self.wheel_radius*2
-
 
             if math.hypot(point[0]-self.front_wheel_x, point[1]-self.front_wheel_y) < self.wheel_radius*2:
                 #print('rear wheel collision')
@@ -74,6 +76,7 @@ class Truck(pygame.sprite.Sprite):
         self.y_F += Gravity
         if not self.rear_wheel_touching_ground:
             self.rear_wheel_y_F += Gravity
+            #print(self.rear_wheel_y_F)
         if not self.front_wheel_touching_ground:
             self.front_wheel_y_F += Gravity
         
@@ -82,7 +85,7 @@ class Truck(pygame.sprite.Sprite):
             self.y_V += self.y_F
         if self.rear_wheel_y_V < terminal_velocity:
             self.rear_wheel_y_V += self.rear_wheel_y_F
-            #print(self.rear_wheel_y_V)
+            #print(self.rear_wheel_y_F)
         if self.front_wheel_y_V < terminal_velocity: 
             self.front_wheel_y_V += self.front_wheel_y_F
         #self.y += self.y_V
