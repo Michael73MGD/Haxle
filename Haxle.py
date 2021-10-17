@@ -7,18 +7,27 @@ import numpy
 class Truck(pygame.sprite.Sprite):
     def __init__(self, color, width, height):
         pygame.sprite.Sprite.__init__(self)
+
+        # Basic shape params
         self.height = height
         self.width = width 
         self.x = 100
-        self.y = 0#windowY*startYOffset - self.height*2
+        self.y = 0  #windowY*startYOffset - self.height*2
+
+        # Image params
         self.image = pygame.Surface([width, height])
         self.image.fill(color)
         self.rect = self.image.get_rect()
+
+        # [Sus]pension params
         self.rear_suspension_height = 20
         self.front_suspension_height = 20
         self.suspension_constant = .3 #random guess, no idea what units are
         self.wheel_radius = 20
         self.rear_wheel_spring_force = 0
+        self.front_wheel_spring_force = 0
+
+        # Rear wheel params
         self.rear_wheel = pygame.Surface([self.wheel_radius*2, self.wheel_radius*2], pygame.SRCALPHA)
         self.rear_wheel_y = self.y+self.height+self.rear_suspension_height+self.wheel_radius
         self.rear_wheel_x = self.x+self.wheel_radius
@@ -26,16 +35,21 @@ class Truck(pygame.sprite.Sprite):
         self.rear_wheel_y_V = 0
         self.rear_wheel_y_F = 0
         self.rear_wheel_touching_ground = False
-        pygame.draw.circle(self.rear_wheel, color, (self.wheel_radius, self.wheel_radius), self.wheel_radius)
-
-        self.front_wheel_spring_force = 0
+        
+        # Front wheel params
         self.front_wheel = pygame.Surface([self.wheel_radius*2, self.wheel_radius*2], pygame.SRCALPHA)
         self.front_wheel_y = self.y+self.height+self.front_suspension_height+self.wheel_radius
         self.front_wheel_x = self.x+self.width-self.wheel_radius*2
+
         self.front_wheel_y_V = 0
         self.front_wheel_y_F = 0
         self.front_wheel_touching_ground = False
+
+        # Draw wheels
+        pygame.draw.circle(self.rear_wheel, color, (self.wheel_radius, self.wheel_radius), self.wheel_radius)
         pygame.draw.circle(self.front_wheel, color, (self.wheel_radius, self.wheel_radius), self.wheel_radius)
+
+        # Force vectors
         self.x_F = 0 #x force component (acceleration)
         self.y_F = 0
         self.x_V = 0 #x velecity component (speed)
