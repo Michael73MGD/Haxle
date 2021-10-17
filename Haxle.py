@@ -1,5 +1,5 @@
 import pygame
-from pygame.constants import K_RIGHT
+from pygame.constants import K_LEFT, K_RIGHT
 import pygame_gui
 import math
 import random
@@ -21,6 +21,7 @@ class Truck(pygame.sprite.Sprite):
         self.width = width 
         self.x = 100
         self.y = 400  #windowY*startYOffset - self.height*2
+        self.angle = 0
 
         # Image params
         self.image = pygame.Surface([width, height])
@@ -103,8 +104,13 @@ class Truck(pygame.sprite.Sprite):
                 print('Crash')
                 return False
 
-    def update(self):  #eventually, pass the gas/brake, angular velocity etc
+    def update(self, keys):  #eventually, pass the gas/brake, angular velocity etc
         self.check_collision()
+        if not self.rear_wheel_touching_ground and not self.front_wheel_touching_ground:
+            if keys[K_RIGHT]:
+                self.angle +=10
+            elif keys[K_LEFT]:
+                self.angle -= 10
         self.y_F += Gravity
         if not self.rear_wheel_touching_ground:
             self.rear_wheel_y_F += Gravity
@@ -126,22 +132,15 @@ class Truck(pygame.sprite.Sprite):
         if self.front_suspension_height < 20:
             self.front_suspension_height += 1.5
         
-        keys = pygame.key.get_pressed()
-        if keys[K_RIGHT]:
-            self.rear_wheel_x_F += .01
-        elif self.rear_wheel_x_F > 0:
-            self.rear_wheel_x_F -= 0.01
-        if self.rear_wheel_x_V > 0:
-            self.rear_wheel_x_V -= 0.01
-        self.rear_wheel_x_V += self.rear_wheel_x_F
-        self.rear_wheel_x += self.rear_wheel_x_V
         
 
         #print(self.rear_suspension_height)
         #should NOT be self.width but whatevs
-        self.angle = math.degrees(math.atan2((self.rear_wheel_y+self.rear_suspension_height)-(self.front_wheel_y + self.front_suspension_height), self.width))
-        print(self.rear_suspension_height,self.front_suspension_height)
-        print(self.angle)
+        if self.rear_wheel_touching_ground and self.front_wheel_touching_ground:
+            self.angle = math.degrees(math.atan2((self.rear_wheel_y+self.rear_suspension_height)-(self.front_wheel_y + self.front_suspension_height), self.width))
+        #print(self.rear_suspension_height,self.front_suspension_height)
+        #print(self.angle)
+        
         self.rear_wheel_y += self.rear_wheel_y_V
         self.y = ((self.rear_wheel_y - self.rear_suspension_height) + (self.front_wheel_y - self.front_suspension_height))/2- self.height
         self.front_wheel_y += self.front_wheel_y_V
@@ -161,7 +160,8 @@ windowY = 900
 startYOffset = .9
 ticks=0
 window_surface = pygame.display.set_mode((windowX, windowY))
-camera_speed = 300
+camera_speed = 0
+max_camera_speed = 120
 background_color = 'SeaGreen'
 background = pygame.Surface((windowX, windowY))
 background.fill(pygame.Color(background_color))
@@ -177,8 +177,8 @@ suspension_constant = Gravity * 100
 terminal_velocity = 10
 points = [(0,windowY*startYOffset)]
 lastY = windowY*startYOffset
-bumpiness = 1.5
-smoothness = 10
+bumpiness = 0.5
+smoothness = 100
 for i in range(1,windowX,smoothness):
     dy = random.uniform(-1*bumpiness,bumpiness)
 
@@ -194,10 +194,17 @@ while is_running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             is_running = False
-
+    keys = pygame.key.get_pressed()
+    if keys[K_RIGHT]:
+        if camera_speed < max_camera_speed:
+            camera_speed+=0.5
+    elif keys[K_LEFT]:
+        if(camera_speed > 0):
+            camera_speed -= 0.5
+    #print(camera_speed)
     
     for Truck in Trucks:
-        Truck.update()
+        Truck.update(keys)
         #background.blit(Truck.image, (Truck.x, Truck.y))
         background.blit(Truck.rear_wheel, (Truck.rear_wheel_x, Truck.rear_wheel_y))
         background.blit(Truck.front_wheel, (Truck.front_wheel_x, Truck.front_wheel_y))
@@ -213,8 +220,8 @@ while is_running:
     
 
     timing += camera_speed
-    if timing >= 60:
-        timing -=60
+    if timing >= max_camera_speed:
+        timing -= max_camera_speed
         for i in range(0,len(points)-1):
             points[i] = (points[i][0],points[i+1][1])
     newY = int(random.uniform(-1*bumpiness,bumpiness+1)+points[len(points)-1][1])
