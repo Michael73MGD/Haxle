@@ -47,6 +47,7 @@ class Truck(pygame.sprite.Sprite):
         
         # Front wheel params
         self.front_wheel = pygame.Surface([self.wheel_radius*2, self.wheel_radius*2], pygame.SRCALPHA)
+        self.front_wheel = pygame.image.load('WHEEL.png')
         self.front_wheel_y = self.y+self.height+self.front_suspension_height+self.wheel_radius
         self.front_wheel_x = self.x+self.width- self.wheel_radius*2
 
@@ -55,8 +56,8 @@ class Truck(pygame.sprite.Sprite):
         self.front_wheel_touching_ground = False
 
         # Draw wheels
-        pygame.draw.circle(self.rear_wheel, color, (self.wheel_radius, self.wheel_radius), self.wheel_radius)
-        pygame.draw.circle(self.front_wheel, color, (self.wheel_radius, self.wheel_radius), self.wheel_radius)
+        #pygame.draw.circle(self.rear_wheel, color, (self.wheel_radius, self.wheel_radius), self.wheel_radius)
+        #pygame.draw.circle(self.front_wheel, color, (self.wheel_radius, self.wheel_radius), self.wheel_radius)
 
         # Force vectors
         self.x_F = 0 #x force component (acceleration)
