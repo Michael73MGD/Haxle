@@ -90,6 +90,8 @@ class Truck(pygame.sprite.Sprite):
 
             if self.rect.collidepoint(point):
                 print('Crash')
+                return False;
+
     def update(self):  #eventually, pass the gas/brake, angular velocity etc
         self.check_collision()
         self.y_F += Gravity
