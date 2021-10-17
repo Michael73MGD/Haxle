@@ -23,6 +23,10 @@ class Truck(pygame.sprite.Sprite):
         self.y = 400  #windowY*startYOffset - self.height*2
         self.angle = 0
 
+        # Vertical velocity for jumps.
+        self.lastY = 400
+        self.deltaY = 0
+
         # Image params
         self.image = pygame.Surface([width, height])
         self.image.fill(color)
@@ -136,14 +140,19 @@ class Truck(pygame.sprite.Sprite):
 
         #print(self.rear_suspension_height)
         #should NOT be self.width but whatevs
-        if self.rear_wheel_touching_ground and self.front_wheel_touching_ground:
-            self.angle = math.degrees(math.atan2((self.rear_wheel_y+self.rear_suspension_height)-(self.front_wheel_y + self.front_suspension_height), self.width))
-        #print(self.rear_suspension_height,self.front_suspension_height)
-        #print(self.angle)
-        
-        self.rear_wheel_y += self.rear_wheel_y_V
+        self.angle = math.degrees(math.atan2((self.rear_wheel_y+self.rear_suspension_height)-(self.front_wheel_y + self.front_suspension_height), self.width))
+        print(self.rear_suspension_height,self.front_suspension_height)
+        print(self.angle)
+
+        self.rear_wheel_y += self.rear_wheel_y_V + self.y_V
+        self.front_wheel_y += self.front_wheel_y_V + self.y_V
+
+        self.lastY = self.y
         self.y = ((self.rear_wheel_y - self.rear_suspension_height) + (self.front_wheel_y - self.front_suspension_height))/2- self.height
-        self.front_wheel_y += self.front_wheel_y_V
+        self.deltaY = self.y - self.lastY
+
+        # warning we have no idea what x is for
+        self.y_V = self.deltaY * .9
         self.x_V += self.x_F
         self.x += self.x_V
         blitRotate2(background, self.image, (self.x, self.y), self.angle)
@@ -157,11 +166,10 @@ clock = pygame.time.Clock()
 pygame.display.set_caption('Haxle')
 windowX = 1600
 windowY = 900
-startYOffset = .9
+startYOffset = .95
 ticks=0
 window_surface = pygame.display.set_mode((windowX, windowY))
-camera_speed = 0
-max_camera_speed = 120
+camera_speed = 50
 background_color = 'SeaGreen'
 background = pygame.Surface((windowX, windowY))
 background.fill(pygame.Color(background_color))
@@ -172,7 +180,7 @@ Trucks = pygame.sprite.Group()
 #truckY = windowY*startYOffset - truck.get_size()[1]
 
 manager = pygame_gui.UIManager((windowX, windowY))
-Gravity = .005 #random guess
+Gravity = .0005 #random guess
 suspension_constant = Gravity * 100
 terminal_velocity = 10
 points = [(0,windowY*startYOffset)]
