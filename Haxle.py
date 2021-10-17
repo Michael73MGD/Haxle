@@ -18,11 +18,12 @@ class Truck(pygame.sprite.Sprite):
         self.image = pygame.Surface([width, height])
         self.image.fill(color)
         self.rect = self.image.get_rect()
+        self.image = pygame.image.load('truck.png')
 
         # [Sus]pension params
         self.rear_suspension_height = 20
         self.front_suspension_height = 20
-        self.suspension_constant = .3 #random guess, no idea what units are
+        self.suspension_constant = .1 #random guess, no idea what units are
         self.wheel_radius = 20
         self.rear_wheel_spring_force = 0
         self.front_wheel_spring_force = 0
@@ -67,7 +68,8 @@ class Truck(pygame.sprite.Sprite):
                 self.rear_wheel_spring_force = -1*self.rear_wheel_y_F
                 
                 #F=kx   x=F/k
-                self.rear_suspension_height += self.rear_wheel_spring_force/self.suspension_constant
+                if self.rear_suspension_height > 0:
+                    self.rear_suspension_height += self.rear_wheel_spring_force/self.suspension_constant
                 #print(self.rear_suspension_height)
                 self.rear_wheel_y_V = 0
                 self.rear_wheel_y_F = 0
@@ -77,7 +79,8 @@ class Truck(pygame.sprite.Sprite):
                 #print('front wheel collision')
                 self.front_wheel_touching_ground = True
                 self.front_wheel_spring_force = -1*self.front_wheel_y_F
-                self.front_suspension_height += self.front_wheel_spring_force/self.suspension_constant
+                if self.front_suspension_height > 0:
+                    self.front_suspension_height += self.front_wheel_spring_force/self.suspension_constant
                 self.front_wheel_y_V = 0
                 self.front_wheel_y_F = 0
                 self.front_wheel_y = point[1]-self.wheel_radius*2
@@ -111,14 +114,15 @@ class Truck(pygame.sprite.Sprite):
 
         #print(self.rear_suspension_height)
         #should NOT be self.width but whatevs
-        self.angle = math.degrees(math.atan2(self.rear_suspension_height-self.front_suspension_height, self.width))
+        self.angle = math.degrees(math.atan2((self.rear_wheel_y+self.rear_suspension_height)-(self.front_wheel_y + self.front_suspension_height), self.width))
         print(self.rear_suspension_height,self.front_suspension_height)
         print(self.angle)
         self.rear_wheel_y += self.rear_wheel_y_V
-        self.y = self.rear_wheel_y - self.rear_suspension_height - self.height
+        self.y = ((self.rear_wheel_y - self.rear_suspension_height) + (self.front_wheel_y - self.front_suspension_height))/2- self.height
         self.front_wheel_y += self.front_wheel_y_V
         self.x_V += self.x_F
         self.x += self.x_V
+        self.image = pygame.transform.rotate(pygame.image.load('truck.png'), self.angle)
     
 
 #Initialization and global vars
