@@ -3,6 +3,13 @@ import pygame_gui
 import math
 import random
 import numpy
+def blitRotate2(surf, image, topleft, angle):
+
+    rotated_image = pygame.transform.rotate(image, angle)
+    new_rect = rotated_image.get_rect(center = image.get_rect(topleft = topleft).center)
+
+    surf.blit(rotated_image, new_rect.topleft)
+    pygame.draw.rect(surf, (255, 0, 0), new_rect, 2)
 
 class Truck(pygame.sprite.Sprite):
     def __init__(self, color, width, height):
@@ -18,7 +25,7 @@ class Truck(pygame.sprite.Sprite):
         self.image = pygame.Surface([width, height])
         self.image.fill(color)
         self.rect = self.image.get_rect()
-        self.image = pygame.image.load('truck.png')
+        self.image = pygame.image.load('truckPro.png')
 
         # [Sus]pension params
         self.rear_suspension_height = 20
@@ -122,7 +129,9 @@ class Truck(pygame.sprite.Sprite):
         self.front_wheel_y += self.front_wheel_y_V
         self.x_V += self.x_F
         self.x += self.x_V
-        self.image = pygame.transform.rotate(pygame.image.load('truck.png'), self.angle)
+        blitRotate2(background, self.image, (self.x, self.y), self.angle)
+        #self.image, self.rect = rot_center(self.image, self.angle, self.x, self.y)
+        #self.image = pygame.transform.rotate(pygame.image.load('truckButBetter.png'), self.angle)
     
 
 #Initialization and global vars
@@ -166,7 +175,7 @@ while is_running:
     
     for Truck in Trucks:
         Truck.update()
-        background.blit(Truck.image, (Truck.x, Truck.y))
+        #background.blit(Truck.image, (Truck.x, Truck.y))
         background.blit(Truck.rear_wheel, (Truck.x, Truck.rear_wheel_y))
         background.blit(Truck.front_wheel, (Truck.x+Truck.width-Truck.wheel_radius*2, Truck.front_wheel_y))
     
