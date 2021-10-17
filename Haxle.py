@@ -1,4 +1,5 @@
 import pygame
+from pygame.constants import K_RIGHT
 import pygame_gui
 import math
 import random
@@ -41,6 +42,8 @@ class Truck(pygame.sprite.Sprite):
         self.rear_wheel_y = self.y+self.height+self.rear_suspension_height+self.wheel_radius
         self.rear_wheel_x = self.x+10
 
+        self.rear_wheel_x_V = 0 
+        self.rear_wheel_x_F = 0
         self.rear_wheel_y_V = 0
         self.rear_wheel_y_F = 0
         self.rear_wheel_touching_ground = False
@@ -51,6 +54,8 @@ class Truck(pygame.sprite.Sprite):
         self.front_wheel_y = self.y+self.height+self.front_suspension_height+self.wheel_radius
         self.front_wheel_x = self.x+self.width- self.wheel_radius*2
 
+        self.front_wheel_x_V = 0
+        self.front_wheel_x_F = 0
         self.front_wheel_y_V = 0
         self.front_wheel_y_F = 0
         self.front_wheel_touching_ground = False
@@ -74,7 +79,7 @@ class Truck(pygame.sprite.Sprite):
             if math.hypot(point[0]-self.rear_wheel_x, point[1]-self.rear_wheel_y) < self.wheel_radius*2:
                 #print('rear wheel collision')
                 self.rear_wheel_touching_ground = True
-                self.rear_wheel_spring_force = -1*self.rear_wheel_y_F
+                self.rear_wheel_spring_force = -1*self.rear_wheel_y_V
                 
                 #F=kx   x=F/k
                 if self.rear_suspension_height > 0:
@@ -87,7 +92,7 @@ class Truck(pygame.sprite.Sprite):
             if math.hypot(point[0]-self.front_wheel_x, point[1]-self.front_wheel_y) < self.wheel_radius*2:
                 #print('front wheel collision')
                 self.front_wheel_touching_ground = True
-                self.front_wheel_spring_force = -1*self.front_wheel_y_F
+                self.front_wheel_spring_force = -1*self.front_wheel_y_V
                 if self.front_suspension_height > 0:
                     self.front_suspension_height += self.front_wheel_spring_force/self.suspension_constant
                 self.front_wheel_y_V = 0
@@ -121,6 +126,15 @@ class Truck(pygame.sprite.Sprite):
         if self.front_suspension_height < 20:
             self.front_suspension_height += 1.5
         
+        keys = pygame.key.get_pressed()
+        if keys[K_RIGHT]:
+            self.rear_wheel_x_F += .01
+        elif self.rear_wheel_x_F > 0:
+            self.rear_wheel_x_F -= 0.01
+        if self.rear_wheel_x_V > 0:
+            self.rear_wheel_x_V -= 0.01
+        self.rear_wheel_x_V += self.rear_wheel_x_F
+        self.rear_wheel_x += self.rear_wheel_x_V
         
 
         #print(self.rear_suspension_height)
@@ -158,12 +172,12 @@ Trucks = pygame.sprite.Group()
 #truckY = windowY*startYOffset - truck.get_size()[1]
 
 manager = pygame_gui.UIManager((windowX, windowY))
-Gravity = .001 #random guess
-suspension_constant = Gravity * 10
+Gravity = .005 #random guess
+suspension_constant = Gravity * 100
 terminal_velocity = 10
 points = [(0,windowY*startYOffset)]
 lastY = windowY*startYOffset
-bumpiness = .5
+bumpiness = 1.5
 smoothness = 10
 for i in range(1,windowX,smoothness):
     dy = random.uniform(-1*bumpiness,bumpiness)
@@ -181,7 +195,7 @@ while is_running:
         if event.type == pygame.QUIT:
             is_running = False
 
-
+    
     for Truck in Trucks:
         Truck.update()
         #background.blit(Truck.image, (Truck.x, Truck.y))
@@ -189,7 +203,7 @@ while is_running:
         background.blit(Truck.front_wheel, (Truck.front_wheel_x, Truck.front_wheel_y))
     
     ticks+=1
-    if bumpiness < 10: bumpiness+=(ticks/100000)
+    if bumpiness < 30: bumpiness+=(ticks/100000)
     
     ms = clock.tick(120)
     window_surface.blit(background, (0, 0))
